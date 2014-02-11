@@ -42,14 +42,7 @@ class User
   end
 
   def authored_replies
-    QPairs.instance.execute(<<-SQL, @id)
-      SELECT
-        id, question_id, parent_id, body
-      FROM
-        replies
-      WHERE
-        user_id = ?
-    SQL
+    Reply.find_by_user_id(@id)
   end
 
   def create_new(options)
@@ -101,14 +94,7 @@ class Question
   end
 
   def replies
-    QPairs.instance.execute(<<-SQL, @id)
-      SELECT
-        id, parent_id, user_id, body
-      FROM
-        replies
-      WHERE
-        question_id = ?
-    SQL
+    Reply.find_by_question_id(@id)
   end
 
   def create_new(options)
@@ -131,9 +117,31 @@ class Reply
     results.map { |result| Reply.new(result) }
   end
 
+  def self.find_by_question_id(q_id)
+    QPairs.instance.execute(<<-SQL, q_id)
+      SELECT
+        id, parent_id, user_id, body
+      FROM
+        replies
+      WHERE
+        question_id = ?
+    SQL
+  end
+
+  def self.find_by_user_id(u_id)
+    QPairs.instance.execute(<<-SQL, u_id)
+      SELECT
+        id, question_id, parent_id, body
+      FROM
+        replies
+      WHERE
+        user_id = ?
+    SQL
+  end
+
   def initialize(options = {})
-    values = options.values_at("question_id", "parent_id", "user_id", "body")
-    @question_id, @parent_id, @user_id, @body = values
+    values = options.values_at("id", "question_id", "parent_id", "user_id", "body")
+    @id, @question_id, @parent_id, @user_id, @body = values
   end
 
   def create_new(options)
@@ -148,4 +156,49 @@ class Reply
 
     @id = QPairs.instance.last_insert_row_id
   end
+
+  def author
+    QPairs.instance.execute(<<-SQL, @user_id)
+      SELECT
+        id, fname, lname
+      FROM
+        users
+      WHERE
+        id = ?
+    SQL
+  end
+
+  def question
+    QPairs.instance.execute(<<-SQL, @question_id)
+      SELECT
+        id, title, body, user_id
+      FROM
+        questions
+      WHERE
+        id = ?
+    SQL
+  end
+
+  def parent_reply
+    QPairs.instance.execute(<<-SQL, @parent_id)
+      SELECT
+        *
+      FROM
+        replies
+      WHERE
+        id = ?
+    SQL
+  end
+
+  def child_replies
+    QPairs.instance.execute(<<-SQL, @id)
+      SELECT
+        *
+      FROM
+        replies
+      WHERE
+        parent_id = ?
+    SQL
+  end
+  # /Reply.class
 end
