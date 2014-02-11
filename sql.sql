@@ -77,7 +77,8 @@ INSERT INTO
 	questions(title, body, user_id)
 VALUES
 	('What is love?', "Baby don't hurt me", 1),
-	('Why do cats moo?', 'Seriously, I want to know.', 2);
+	('Why do cats moo?', 'Seriously, I want to know.', 2),
+	("What does 'Question_followers' mean?", "I am very confused by this. Cats?", 2 );
 
 -- Replies
 INSERT INTO
@@ -94,3 +95,13 @@ VALUES
 	(1, 1), -- Sam likes her own post
 	(2, 1),	-- Andrew likes Sam's post
 	(1, 2);	-- Sam likes Andrew's post
+
+--Question Followers
+INSERT INTO
+	question_followers(user_id, question_id)
+VALUES
+	(1, 1),
+	(1, 2),
+	(1, 3),
+	(2, 2),
+	(2, 3);
