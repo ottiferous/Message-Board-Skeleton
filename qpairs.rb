@@ -81,6 +81,10 @@ class Question
     SQL
   end
 
+  def self.most_followed(n)
+    QuestionFollower.most_followed_questions(n)
+  end
+
   def initialize(options = {})
     @id, @title, @body, @user_id = options.values_at("id", "title", "body", "user_id")
   end
@@ -243,5 +247,30 @@ class QuestionFollower
     SQL
   end
 
+  def self.most_followed_questions(n)
+    QPairs.instance.execute(<<-SQL, n)
+    SELECT questions.*
+    FROM   questions
+    WHERE  questions.id IN (SELECT question_id
+                            FROM   question_followers
+                            GROUP  BY question_id
+                            ORDER  BY COUNT(question_id)
+                            DESC LIMIT ?)
+    SQL
+  end
+
   #/QuestionFollower.class
+end
+
+class QuestionLike
+
+  def self.all
+    results = QPairs.instance.execute("SELECT * FROM question_likes")
+    results.map { |result| QuestionLike.new(result) }
+  end
+
+  def self.likers_for_question_id(q_id)
+
+  end
+
 end
