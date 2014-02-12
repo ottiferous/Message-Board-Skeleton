@@ -94,7 +94,11 @@ INSERT INTO
 VALUES
 	(1, 1), -- Sam likes her own post
 	(2, 1),	-- Andrew likes Sam's post
-	(1, 2);	-- Sam likes Andrew's post
+	(1, 2),	-- Sam likes Andrew's post
+	(3, 1),
+	(4, 1),
+	(5, 1),
+	(6, 1);
 
 --Question Followers
 INSERT INTO
@@ -105,3 +109,25 @@ VALUES
 	(1, 3),
 	(2, 2),
 	(2, 3);
+
+
+
+SELECT AVG(likes)
+FROM	(-- Number of likes per post for a given user
+			SELECT COUNT(question_id) AS likes
+			FROM question_likes
+			WHERE question_id IN (
+			-- Returning the questions.id of all questions authored by user
+														SELECT questions.id
+														FROM question_likes
+															JOIN questions
+																ON question_likes.question_id = questions.id
+														WHERE questions.user_id IS 2
+														-- GROUP BY question_id)
+			GROUP BY question_id)
+GROUP BY question_id;
+
+
+			-- SELECT id
+			-- FROM questions
+			-- WHERE user_id = 1)
