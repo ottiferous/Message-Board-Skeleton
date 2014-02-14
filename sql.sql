@@ -114,20 +114,15 @@ VALUES
 
 SELECT AVG(likes)
 FROM	(-- Number of likes per post for a given user
-			SELECT COUNT(question_id) AS likes
-			FROM question_likes
-			WHERE question_id IN (
-			-- Returning the questions.id of all questions authored by user
-														SELECT questions.id
-														FROM question_likes
-															JOIN questions
-																ON question_likes.question_id = questions.id
-														WHERE questions.user_id IS 2
-														-- GROUP BY question_id)
-			GROUP BY question_id)
+	SELECT COUNT(question_id) AS likes
+	FROM question_likes
+	WHERE question_id IN	(-- Returning the questions.id of all questions authored by user
+				SELECT questions.id
+				FROM question_likes
+					JOIN questions
+						ON question_likes.question_id = questions.id
+				WHERE questions.user_id IS 2
+				GROUP BY question_id
+				)
+	)
 GROUP BY question_id;
-
-
-			-- SELECT id
-			-- FROM questions
-			-- WHERE user_id = 1)
